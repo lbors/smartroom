@@ -22,7 +22,7 @@ void loop()
 void intensidade_led(){
   
   valorLDR = analogRead(ldrPin);
-  luminosidade = map(valorLDR, 0, 1023, 0, 255);
+  luminosidade = map(valorLDR, 0, 1023, 0, 255); // Converte valor lido do LDR para ajustar a luminosidade do led
   Serial.print("Valor lido do LDR: ");
   Serial.print(valorLDR);
   Serial.print(" = Luminosidade: ");
@@ -33,13 +33,5 @@ void intensidade_led(){
   else
     analogWrite(ledPin, luminosidade);
   delay(500);
-  /*
-   for (int x=0; x<180; x=x+10) 
-  {
-    // converte graus para radianos e então obtém o valor do seno
-    sinVal = (sin(x*(3.1412/180)));
-    ledVal = int(sinVal*255);
-    analogWrite(ledPin, ledVal);
-    delay(5000);
-  }*/
+ 
   }
