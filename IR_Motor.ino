@@ -1,11 +1,14 @@
 #include <Servo.h>
 
+//Servo
 Servo s; //cria o objeto servo para controle do servo 
 int pos = 0; // variavel de posição do servo
 
+//Sensor ir
 int ir_sensor = 8;
-int led = 4;
 int objeto = 0;  
+
+int led = 4;
    
 void setup()  
 {
@@ -40,7 +43,7 @@ void motor(){
     sensor_ir();
   delay(30);
   }
-//delay(1000);
+delay(30);
   for(pos = 180; pos >= 0; pos--)
   {
     s.write(pos);
