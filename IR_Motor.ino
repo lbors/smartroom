@@ -2,7 +2,8 @@
 
 //Servo
 Servo s; //cria o objeto servo para controle do servo 
-int pos = 0; // variavel de posição do servo
+int pos, pos_ant = 0; // variavel de posição do servo
+
 
 //Sensor ir
 int ir_sensor = 8;
@@ -21,22 +22,39 @@ void setup()
 void loop()  
 {  
   motor();
-} 
+}
 
 void sensor_ir(){
   objeto = digitalRead(ir_sensor); // realiza a leitura do sensor
   if (objeto == LOW){
-    while(objeto==LOW){
-      digitalWrite(led, HIGH);
-      //s.write(pos);
-      objeto=digitalRead(ir_sensor);
-    }
+    digitalWrite(led, HIGH);
+    controle = true;
   }
   else
-    digitalWrite(led, LOW);
+    controle = false;
 }
 
-void motor(){
+void motor_while(){
+  
+  do
+    sensor_ir();
+  while(pos<180 && controle == false){
+    s.write(pos);
+    sensor_ir();
+    pos++;
+    delay(30);
+  }
+  delay(30);
+  while(pos>=0 && controle == false){
+    s.write(pos);
+    sensor_ir();
+    pos--;
+    delay(30);
+  }
+}
+
+/*
+void motor_for(){
   for(pos = 0; pos < 180; pos++)
   {
     s.write(pos);
@@ -51,3 +69,4 @@ delay(30);
     delay(30);
   }
 }
+*/
