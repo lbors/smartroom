@@ -1,7 +1,7 @@
 // Projeto Brilho LED PWM e LDR
  
 int ledPin = 11;
-int ldrPin = A5;
+int ldrPin = A3;
 int valorLDR = 0;
 float luminosidade = 0;
 //float sinVal;
