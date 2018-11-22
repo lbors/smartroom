@@ -15,7 +15,6 @@ int rotacao = 0;
 // Servo e IR
 #include <Servo.h>
 Servo s; //cria o objeto servo para controle do servo
-//#define pinServo 6
 int pos, pos_def = 0; // variavel de posição do servo
 boolean ida = true;
 boolean volta, controle = false;
@@ -32,7 +31,7 @@ void setup() {
   dht.begin();
   pinMode(motorPin, OUTPUT);
 
-  s.attach(6); //atribui o pino 9 ao servo
+  s.attach(6); //atribui o pino 6 ao servo
   pinMode(8, INPUT); //Pino ligado ao coletor do fototransistor
   pinMode(4, OUTPUT);
 }
