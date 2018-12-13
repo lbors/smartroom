@@ -1,5 +1,13 @@
+//Contagem de Tempo
+long previousMillis = 0;
+long interval = 10000;
+
+//PIR
+int pirPin = A5;   //Analogico A5 para o sensor
+int val_pir = 0;
+
 // LDR e Led
-int ledPin = 11;
+int ledPin = 5;
 int ldrPin = A3;
 int valorLDR = 0;
 float luminosidade = 0;
@@ -15,15 +23,20 @@ int rotacao = 0;
 // Servo e IR
 #include <Servo.h>
 Servo s; //cria o objeto servo para controle do servo
-int pos, pos_def = 0; // variavel de posição do servo
+int pos = 20;
+int pos_def = 0; // variavel de posição do servo
 boolean ida = true;
 boolean volta, controle = false;
 
-int ir_sensor = 8;
+//int ir_sensor = 8;
 int objeto = 0;
+int buttonPin = 12;
+//int buttonState = 0;
 
 void setup() {
   Serial.begin(9600);
+  pinMode(pirPin, INPUT);
+  
   pinMode(ledPin, OUTPUT);
   pinMode(ldrPin, INPUT);
 
@@ -32,18 +45,45 @@ void setup() {
   pinMode(motorPin, OUTPUT);
 
   s.attach(6); //atribui o pino 6 ao servo
-  pinMode(8, INPUT); //Pino ligado ao coletor do fototransistor
-  pinMode(4, OUTPUT);
+  
+//  pinMode(ir_sensor, INPUT); //Pino ligado ao coletor do fototransistor
+
+  pinMode(buttonPin, INPUT);
 }
 
 void loop() {
-  intensidade_led();
-  temp();
-  motor();
+  unsigned long currentMillis = millis();
+  val_pir = analogRead(pirPin); 
+  
+  if(val_pir > 100){
+    previousMillis = currentMillis;
+    Serial.println("PIR DETECTOU");
+    liga();
+  }else{
+    if(currentMillis - previousMillis > interval){
+      previousMillis = currentMillis;
+      liga();
+    }else{
+    desliga();
+    Serial.println("PIR NÂO DETECTOU, sistema desligou");
+    }
+  }
   delay(1000);
 }
 
-void intensidade_led(){
+void liga(){
+  intensidade_led();
+  temp();
+  motor();
+  Serial.println("---------------------------");
+}
+
+void desliga(){
+  analogWrite(ledPin, LOW);
+  digitalWrite(motorPin, LOW);
+}
+
+void intensidade_led() {
   valorLDR = analogRead(ldrPin);
   luminosidade = map(valorLDR, 600, 1023, 0, 255); // Converte valor lido do LDR para ajustar a luminosidade do led
   Serial.print("Valor lido do LDR: ");
@@ -51,72 +91,72 @@ void intensidade_led(){
   Serial.print(" = Luminosidade: ");
   Serial.println(luminosidade);
 
-  if(luminosidade<30.00)
+  if (luminosidade < 30.00)
     analogWrite(ledPin, LOW);
   else
     analogWrite(ledPin, luminosidade);
 }
 
-void temp(){
+void temp() {
   float t = dht.readTemperature();
   Serial.print("Temperatura: ");
   Serial.print(t);
   Serial.println(" *C");
-  Serial.println("---------------------------");
-
-  rotacao = map(t, 16, 35, 0,255);
+  
+  rotacao = map(t, 16, 35, 0, 255);
   digitalWrite(motorPin, rotacao);
-  Serial.print("Rotacao: ");
+  Serial.print("Motor com rotacao: ");
   Serial.println(rotacao);
-  Serial.println("---------------------------");
 }
-
-void sensor_ir(){
-  objeto = digitalRead(ir_sensor); // realiza a leitura do sensor
-  if (objeto == LOW){
+//*
+void sensor_ir() {
+//  objeto = digitalRead(ir_sensor); // realiza a leitura do sensor
+  objeto = digitalRead(buttonPin);
+  if (objeto == HIGH) {
     controle = true;
-    Serial.println("Detectado");
+    Serial.println("IR Detectado");
   }
   else
     controle = false;
 }
 
-void motor(){
-  if(ida == true){
-    for(pos = pos_def; pos < 180; pos++){
+void motor() {
+  if (ida == true) {
+    for (pos = pos_def; pos < 100; pos++) {
       s.write(pos);
       sensor_ir();
-      if(controle == true){
+      if (controle == true) {
         pos_def = pos;
         Serial.println("Vai parar, foi detectado na ida");
         break;
       }
-      if(pos == 179 && controle == false){
+      if (pos == 99 && controle == false) {
         ida = false;
         volta = true;
         Serial.println("Nada detectado na ida");
         pos_def = pos;
       }
-      delay(30);
+      delay(60);
     }
   }
-  
-  if(volta == true){
-    for(pos = pos_def; pos >= 0; pos--){
+
+  if (volta == true) {
+    for (pos = pos_def; pos >= 5; pos--) {
       s.write(pos);
       sensor_ir();
-      if(controle == true){
+      if (controle == true) {
         pos_def = pos;
         Serial.println("Vai parar, foi detectado na volta");
         break;
       }
-      if(pos == 0 && controle == false){
+      if (pos == 5 && controle == false) {
         volta = false;
         ida = true;
         Serial.println("Nada detectado na volta");
         pos_def = pos;
       }
-      delay(30);
+      delay(60);
     }
   }
 }
+//*/
